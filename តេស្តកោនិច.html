@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <title>តេស្តកោនិចថ្នាក់ទី១២ - Formatted Math</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Kantumruy Pro', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .quiz-item { margin-bottom: 25px; border: 1px solid #dcdcdc; padding: 20px; border-radius: 10px; background: #fff; }
+        .question { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-btn { background: #f9f9f9; border: 1px solid #ccc; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 1em; }
+        .option-btn:hover { background: #eef2f3; border-color: #3498db; }
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
+        .wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        .feedback { margin-top: 10px; font-style: italic; font-weight: bold; }
+        .score-section { text-align: center; margin-top: 30px; padding: 20px; background: #eef2f3; border-radius: 10px; display: none; }
+        .btn-final { display: block; width: 200px; margin: 20px auto; padding: 15px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>វិញ្ញាសាតេស្ត៖ កោនិច បង្រៀនដោយ ភាច​ វិបុល </h1>
+    
+    <div id="quiz-container"></div>
+
+    <button class="btn-final" onclick="showScore()">មើលពិន្ទុសរុប</button>
+    
+    <div id="score-section" class="score-section">
+        <h2>លទ្ធផលរបស់អ្នកគឺ៖ <span id="final-score">0</span> / 125 ពិន្ទុ</h2>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    { q: "1. រកកូអ័រដោនេកំណុំនៃប៉ារ៉ាបូល \\( y^2 = 12x \\)", a: ["\\( F(3, 0) \\)", "\\( F(0, 3) \\)", "\\( F(-3, 0) \\)", "\\( F(6, 0) \\)"], c: 0 },
+    { q: "2. សមីការបន្ទាត់ប្រាប់ទិសនៃ \\( x^2 = -8y \\) គឺ៖", a: ["\\( y = -2 \\)", "\\( y = 2 \\)", "\\( x = 2 \\)", "\\( x = -2 \\)"], c: 1 },
+    { q: "3. រកកំពូលនៃប៉ារ៉ាបូល \\( (y - 2)^2 = 4(x + 1) \\)", a: ["\\( V(1, 2) \\)", "\\( V(-1, -2) \\)", "\\( V(-1, 2) \\)", "\\( V(2, -1) \\)"], c: 2 },
+    { q: "4. រកប្រវែងឡាទូសរិចតុមនៃ \\( y^2 = 20x \\)", a: ["5", "10", "20", "40"], c: 2 },
+    { q: "5. រកប្រវែងអ័ក្សធំនឹង \\( \\frac{x^2}{25} + \\frac{y^2}{9} = 1 \\)", a: ["5", "10", "3", "6"], c: 1 },
+    { q: "6. អិចសង់ទ្រីស៊ីតេ \\( e \\) នៃ \\( \\frac{x^2}{100} + \\frac{y^2}{64} = 1 \\) គឺ៖", a: ["0.8", "0.6", "1.25", "0.75"], c: 1 },
+    { q: "7. កំពូលនៃអ៊ីពែបូល \\( \\frac{x^2}{16} - \\frac{y^2}{9} = 1 \\) គឺ៖", a: ["\\( (0, \\pm 4) \\)", "\\( (\\pm 4, 0) \\)", "\\( (\\pm 3, 0) \\)", "\\( (0, \\pm 3) \\)"], c: 1 },
+    { q: "8. សមីការអាស៊ីមតូតនៃ \\( \\frac{y^2}{4} - \\frac{x^2}{1} = 1 \\) គឺ៖", a: ["\\( y = \\pm x \\)", "\\( y = \\pm 2x \\)", "\\( y = \\pm 0.5x \\)", "\\( y = \\pm 4x \\)"], c: 1 },
+    { q: "9. ក្នុងអ៊ីពែបូល ទំនាក់ទំនងមេគុណគឺ៖", a: ["\\( a^2 = b^2 + c^2 \\)", "\\( b^2 = a^2 + c^2 \\)", "\\( c^2 = a^2 + b^2 \\)", "\\( c = a + b \\)"], c: 2 },
+    { q: "10. ផ្ចិតនៃអេលីប \\( \\frac{(x-1)^2}{4} + \\frac{(y+2)^2}{16} = 1 \\) គឺ៖", a: ["\\( C(-1, 2) \\)", "\\( C(1, 2) \\)", "\\( C(1, -2) \\)", "\\( C(-1, -2) \\)"], c: 2 }
+    // អ្នកអាចបន្ថែមសំណួររហូតដល់ ៣០ តាមទម្រង់នេះ
+];
+
+const container = document.getElementById('quiz-container');
+let correctAnswers = 0;
+
+function initQuiz() {
+    quizData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'quiz-item';
+        div.innerHTML = `
+            <div class="question">${item.q}</div>
+            <div class="options" id="opt-container-${index}">
+                ${item.a.map((opt, i) => `<button class="option-btn" onclick="check(${index}, ${i}, this)">${opt}</button>`).join('')}
+            </div>
+            <div id="feedback-${index}" class="feedback"></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function check(qIdx, aIdx, btn) {
+    const parent = document.getElementById(`opt-container-${qIdx}`);
+    if (parent.dataset.answered) return;
+    
+    const correctIdx = quizData[qIdx].c;
+    const feedback = document.getElementById(`feedback-${qIdx}`);
+    const btns = parent.getElementsByTagName('button');
+
+    if (aIdx === correctIdx) {
+        btn.classList.add('correct');
+        feedback.innerHTML = "✅ ត្រឹមត្រូវ!";
+        feedback.style.color = "green";
+        correctAnswers++;
+    } else {
+        btn.classList.add('wrong');
+        btns[correctIdx].classList.add('correct');
+        feedback.innerHTML = "❌ ខុសហើយ!";
+        feedback.style.color = "red";
+    }
+    parent.dataset.answered = "true";
+}
+
+function showScore() {
+    const totalScore = (correctAnswers * (125 / quizData.length)).toFixed(2);
+    document.getElementById('final-score').innerText = totalScore;
+    document.getElementById('score-section').style.display = 'block';
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+initQuiz();
+</script>
+
+</body>
+</html>
